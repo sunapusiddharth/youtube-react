@@ -1,8 +1,8 @@
 import apiReducer from './api'
 import {combineReducers} from 'redux'
-import videosReducer from './videos'
+import videos from './videos'
 
 export default combineReducers({
   api:apiReducer,
-  videos:videosReducer
+  videos:videos
 })

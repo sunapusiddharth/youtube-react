@@ -1,25 +1,42 @@
 import React, { Component } from 'react'
 import {VideoGrid} from '../../../components/VideoGrid/VideoGrid'
 import './HomeContent.scss'
-import SideBar from '../../SideBar/SideBar'
-import {VideoPreview} from '../../../components/VideoPreview/VideoPreview'
+
 import {connect} from 'react-redux'
-import {getMostPopularVideos} from '../../../store/reducers/videos'
+import {getMostPopularVideos,getVideosByCategory} from '../../../store/reducers/videos'
+import {InfiniteScroll} from '../../../components/InfiniteScroll/InfiniteScroll'
 
 const AMOUNT_TRENDING_VIDEOS =12
 
 class HomeContent extends Component {
+    //function to create grid dynamically :
+    /*
+    We added a new function called getVideoGridForCategories. In here we loop over the 
+    category ids from this.props.videosByCategory and create a VideoGrid component for each category. We also do a little bit of styling by preventing the last video grid from showing a grey divider at its bottom
+    */
+    getVideoGridsForCategories(){
+        const categoryTitles = Object.keys(this.props.videosByCategory || {})
+        return categoryTitles.map((categoryTitle,index)=>{
+            const videos= this.props.videosByCategory[categoryTitle]
+            //the last video grid element should not have a divider 
+            const hideDivider = index === categoryTitles.length-1
+            return <VideoGrid title={categoryTitle} videos={videos} key={categoryTitle} hideDivider={hideDivider}/>
+        })
+    }
 
     render(){
         const trendingVideos = this.getTrendingVideos()
+        const categoryGrids = this.getVideoGridsForCategories()
         return(
             <React.Fragment>
-                <SideBar/>
+                
                 <div className="home-content">
                     <div className="responsive-video-grid-container">
                         <VideoGrid title="Trending" videos={trendingVideos}/>
+                        {categoryGrids}
+                        <InfiniteScroll bottomReachedCallback={this.props.bottomReachedCallback} showLoader={this.props.showLoader}/>
                     </div>
-                    <VideoPreview/>
+                    
                 </div>    
             </React.Fragment>
             
@@ -32,6 +49,7 @@ class HomeContent extends Component {
 }
 function mapStateToProps(state){
     return{
+        videosByCategory:getVideosByCategory(state),
         mostPopularVideos:getMostPopularVideos(state)
     }
 }

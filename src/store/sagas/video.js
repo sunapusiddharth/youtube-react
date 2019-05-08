@@ -16,19 +16,18 @@ export function* watchMostPopularVideos() {
     yield fetchEntity(request, videoActions.mostPopular);
   }
 
-export const fetchVideoCategories = fetchEntity.bind(null,api.buildVideoCategoriesRequest,videoActions.categories)
-export function* watchVideoCategories(){
-  console.log("from watchers")
-  console.log(videoActions)
-  yield takeEvery(videoActions.VIDEO_CATEGORIES[REQUEST],fetchVideoCategories)
+export const fetchVideoCategories = fetchEntity.bind(null, api.buildVideoCategoriesRequest, videoActions.categories);
+
+export function* watchVideoCategories() {
+  yield takeEvery(videoActions.VIDEO_CATEGORIES[REQUEST], fetchVideoCategories);
 }
 
 //this is a watcher saga we listen for MOST_POPULAR_BY_CATEGORY_REQUEST action
 //and extract the category ids from the payload and let our worker saga do the rest
-export function* watchMostPopularVideosByCategory(){
-  while(true){
-    const {categories} = yield take(videoActions.MOST_POPULAR_BY_CATEGORY[REQUEST])
-    yield fork(fetchMostPopularVideosByCategory,categories)
+export function* watchMostPopularVideosByCategory() {
+  while(true) {
+    const {categories} = yield take(videoActions.MOST_POPULAR_BY_CATEGORY[REQUEST]);
+    yield fork(fetchMostPopularVideosByCategory, categories);
   }
 }
 
@@ -38,16 +37,15 @@ export function* watchMostPopularVideosByCategory(){
 //for each category we build a request using buildMostPopularVideosRequest ans then wrapp it inside a redux-saga call effect by using call()
 //then we execute all the requests using all which willproces all the req parallely like promise.all
 //
-export function* fetchMostPopularVideosByCategory(categories){
-  const request = categories.map(category=>{
-    const wrapper = ignoreErrors(api.buildMostPopularVideosRequest,12,false,null,category)
-    return call(wrapper)
-  })
-
-  try{
-    const response = yield all(request)
-    yield put(videoActions.mostPopularByCategory.success(response,categories))
-  }catch(error){
-    yield put(videoActions.mostPopularByCategory.failure(error))
+export function* fetchMostPopularVideosByCategory(categories) {
+  const requests = categories.map(category => {
+    const wrapper = ignoreErrors(api.buildMostPopularVideosRequest, 12, false, null, category);
+    return call(wrapper);
+  });
+  try {
+    const response = yield all(requests);
+    yield put(videoActions.mostPopularByCategory.success(response, categories));
+  } catch (error) {
+    yield put(videoActions.mostPopularByCategory.failure(error));
   }
 }

@@ -14,45 +14,43 @@ class HomeContent extends Component {
     We added a new function called getVideoGridForCategories. In here we loop over the 
     category ids from this.props.videosByCategory and create a VideoGrid component for each category. We also do a little bit of styling by preventing the last video grid from showing a grey divider at its bottom
     */
-    getVideoGridsForCategories(){
-        const categoryTitles = Object.keys(this.props.videosByCategory || {})
-        return categoryTitles.map((categoryTitle,index)=>{
-            const videos= this.props.videosByCategory[categoryTitle]
-            //the last video grid element should not have a divider 
-            const hideDivider = index === categoryTitles.length-1
-            return <VideoGrid title={categoryTitle} videos={videos} key={categoryTitle} hideDivider={hideDivider}/>
-        })
-    }
+   getVideoGridsForCategories() {
+    const categoryTitles = Object.keys(this.props.videosByCategory || {});
+    return categoryTitles.map((categoryTitle,index) => {
+      const videos = this.props.videosByCategory[categoryTitle];
+      // the last video grid element should not have a divider
+      const hideDivider = index === categoryTitles.length - 1;
+      return <VideoGrid title={categoryTitle} videos={videos} key={categoryTitle} hideDivider={hideDivider}/>;
+    });
+  }
 
     render(){
         const trendingVideos = this.getTrendingVideos()
         const categoryGrids = this.getVideoGridsForCategories()
-        return(
-            <React.Fragment>
-                
-                <div className="home-content">
-                    <div className="responsive-video-grid-container">
-                        <VideoGrid title="Trending" videos={trendingVideos}/>
-                        {categoryGrids}
-                        <InfiniteScroll bottomReachedCallback={this.props.bottomReachedCallback} showLoader={this.props.showLoader}/>
-                    </div>
-                    
-                </div>    
-            </React.Fragment>
-            
-        )
+        return (
+            <div className='home-content'>
+              <div className="responsive-video-grid-container">
+                <InfiniteScroll bottomReachedCallback={this.props.bottomReachedCallback} showLoader={this.props.showLoader}>
+                <VideoGrid title='Trending' videos={trendingVideos}/>
+                {categoryGrids}
+                </InfiniteScroll>
+              </div>
+            </div>
+          );
     }
 
     getTrendingVideos(){
         return this.props.mostPopularVideos.slice(0,AMOUNT_TRENDING_VIDEOS)
     }
 }
-function mapStateToProps(state){
-    return{
-        videosByCategory:getVideosByCategory(state),
-        mostPopularVideos:getMostPopularVideos(state)
-    }
-}
+
+
+function mapStateToProps(state) {
+    return {
+      videosByCategory: getVideosByCategory(state),
+      mostPopularVideos: getMostPopularVideos(state),
+    };
+  }
 
 
 /*

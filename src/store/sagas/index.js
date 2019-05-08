@@ -35,9 +35,9 @@ the last n-1 parameters are passed as parameters to the first parameter ,which i
 I know it’s kinda weird. Now if the promise resolves,
  we just return the result, if the promise is rejected, we just return the error and pretend nothing has happened
 */
-export function ignoreErrors(fn,...args){
-  return ()=>{
-    const ignoreErrorCallback = (response)=>response
-    return fn(...args).then(ignoreErrorCallback,ignoreErrorCallback)
-  }
+export function ignoreErrors(fn, ...args) {
+  return () => {
+    const ignoreErrorCallback = (response) => response;
+    return fn(...args).then(ignoreErrorCallback, ignoreErrorCallback);
+  };
 }

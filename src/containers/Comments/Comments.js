@@ -3,7 +3,7 @@ import CommentsHeader from './CommentsHeader/CommentsHeader'
 import AddComment from './AddComment/AddComment';
 import Comment from './Comment/Comment';
 
-export default class Comments extends Component {
+export  class Comments extends Component {
   render() {
     return (
       <div>

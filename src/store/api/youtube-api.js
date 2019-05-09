@@ -89,3 +89,41 @@ export function buildApiRequest(requestMethod, path, params, properties) {
         'regionCode': 'US'
       }, null);
   }
+
+
+  //function to get the detailed data for a particular video 
+  //here the fields param is used to specify what all fields we need to fetch in response
+  //part is req by the API
+  export function buildVideoDetailRequest(videoId) {
+    return buildApiRequest('GET',
+      '/youtube/v3/videos',
+      {
+        part: 'snippet,statistics,contentDetails',
+        id: videoId,
+        fields: 'kind,items(contentDetails/duration,id,snippet(channelId,channelTitle,description,publishedAt,thumbnails/medium,title),statistics)'
+      }, null);
+  }
+
+  export function buildRelatedVideosRequest(videoId, amountRelatedVideos = 12) {
+    return buildApiRequest('GET',
+      '/youtube/v3/search',
+      {
+        part: 'snippet',
+        type: 'video',
+        maxResults: amountRelatedVideos,
+        relatedToVideoId: videoId,
+      }, null);
+  }
+
+
+  //fior getting the channel info 
+
+  export function buildChannelRequest(channelId) {
+    return buildApiRequest('GET',
+      '/youtube/v3/channels',
+      {
+        part: 'snippet,statistics',
+        id: channelId,
+        fields: 'kind,items(id,snippet(description,thumbnails/medium,title),statistics/subscriberCount)'
+      }, null);
+  }

@@ -5,6 +5,7 @@ import TimeAgo from 'javascript-time-ago'
 import en from 'javascript-time-ago/locale/en'
 import {getShortNumberString} from '../../services/number/number-format'
 import {getVideoDurationString} from '../../services/date/date-format'
+import {Link} from 'react-router-dom'
 
 TimeAgo.locale(en)
 const timeAgo = new TimeAgo('en-US')
@@ -20,13 +21,19 @@ export class VideoPreview extends React.Component {
     const duration = video.contentDetails ?video.contentDetails.duration:null
     const videoDuration  =getVideoDurationString(duration)
     
-    return (
+    // Our VideoPreview component now expects two new props: pathname and search. 
+    // The pathname prop is the absolute path to which the user should be redirected to.
+    //  For example, if we want to get redirected to /foo/bar, then pathname must be set to ‘/foo/bar'.
+    // The search prop is the query string that we want to append to the address, so if we want 
+    // to add ?id=1234 as query parameters to our URL, we need to set the search prop to '?id=1234'
     
-      <div className={['video-preview',horizontal].join(' ')}>
+    return (
+    <Link to ={{pathname:this.props.pathname,search:this.props.search}}>
+    <div className={['video-preview',horizontal].join(' ')}>
         <div className='image-container'>
           <Image src={video.snippet.thumbnails.medium.url}/>
           <div className='time-label'>
-            <span>{videoDuration}</span>
+            <span>{videoDuration}</span>  
           </div>
         </div>
 
@@ -38,6 +45,7 @@ export class VideoPreview extends React.Component {
           </div>
         </div>
       </div>
+    </Link>
     );
   }
   static getFormattedViewAndTimeString(video){

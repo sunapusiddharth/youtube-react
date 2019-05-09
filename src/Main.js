@@ -2,14 +2,14 @@
 import {Switch,Route} from 'react-router-dom';
 import React from 'react';
 import Sidhu from './containers/Watch/Sidhu';
-import { Watch } from './containers/Watch/Watch';
+import  Watch  from './containers/Watch/Watch';
 import Home from './containers/Home/Home'
 
-const Main = ()=>(
+const Main = (props)=>(
 <main>
     <Switch>
         <Route exact path='/' component={Home}/>
-        <Route exact path="/watch" component={Watch}/>
+        <Route exact path="/watch" render={()=><Watch key={props.location.key}/>}/>
         <Route exact path="/sidhu" component={Sidhu}/>
     </Switch>
 </main>

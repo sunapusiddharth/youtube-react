@@ -1,12 +1,17 @@
 import {MOST_POPULAR, VIDEO_CATEGORIES,MOST_POPULAR_BY_CATEGORY} from '../actions/video'
+import {VIDEO_DETAILS,WATCH_DETAILS} from '../actions/watch';
 import {SUCCESS} from '../actions'
 import {createSelector} from 'reselect'
+import {WA} from '../actions/video'
+import {VIDEO_LIST_RESPONSE,SEARCH_LIST_RESPONSE} from '../api/youtube-response-types'
+import { getSearchParam } from '../../services/url';
 
 const initialState = {
     byId:{},
     mostPopular:{},
     categories:{},
-    byCategory:{}
+    byCategory:{},
+    related:{}
 }
 
 //selectors :
@@ -45,6 +50,11 @@ export default function videos(state = initialState, action) {
         return reduceFetchVideoCategories(action.response, state);
       case MOST_POPULAR_BY_CATEGORY[SUCCESS]:
         return reduceFetchMostPopularVideosByCategory(action.response, action.categories, state);
+        case WATCH_DETAILS[SUCCESS]:
+        console.log('from reduce switch',action)
+        return reduceWatchDetails(action.response,state)
+        case VIDEO_DETAILS[SUCCESS]:
+      return reduceVideoDetails(action.response, state);
       default:
         return state;
     }
@@ -196,3 +206,100 @@ export const videoCategoriesLoaded = createSelector(
       return Object.keys(videosByCategory || {}).length;
     }
   );
+
+
+  //for the detailed data for the single video component
+  //items array in the videos will contain all the data about video
+  //
+  function reduceWatchDetails(responses, prevState) {
+    const videoDetailResponse = responses.find(r => r.result.kind === VIDEO_LIST_RESPONSE);
+    // we know that items will only have one element
+    // because we explicitly asked for a video with a specific id
+    const video = videoDetailResponse.result.items[0];
+    const relatedEntry = reduceRelatedVideosRequest(responses);
+  
+    return {
+      ...prevState,
+      byId: {
+        ...prevState.byId,
+        [video.id]: video
+      },
+      related: {
+        ...prevState.related,
+        [video.id]: relatedEntry
+      }
+    };
+  }
+
+  //to get the videoi id this will act as a selector 
+  export const getVideoById = (state,videoId)=>{
+    console.log('sidhu567',state.videos.byId[videoId])
+    return state.videos.byId[videoId]
+  }
+  
+  function reduceRelatedVideosRequest(responses) {
+    const relatedVideosResponse = responses.find(r => r.result.kind === SEARCH_LIST_RESPONSE)
+    const {pageInfo, items, nextPageToken} = relatedVideosResponse.result
+    const relatedVideoIds = items.map(video => video.id.videoId)
+  
+    return  {
+      totalResults: pageInfo.totalResults,
+      nextPageToken,
+      items: relatedVideoIds
+    };
+  }
+
+  function reduceVideoDetails(responses, prevState) {
+    const videoResponses = responses.filter(response => response.result.kind === VIDEO_LIST_RESPONSE);
+    const parsedVideos = videoResponses.reduce((videoMap, response) => {
+        // we're explicitly asking for a video with a particular id
+        // so the response set must either contain 0 items (if a video with the id does not exist)
+        // or at most one item (i.e. the channel we've been asking for)
+        const video = response.result.items ? response.result.items[0] : null;
+        if (!video) {
+          return videoMap;
+        }
+        videoMap[video.id] = video;
+        return videoMap;
+      }, {});
+  
+    return {
+      ...prevState,
+      byId: {...prevState.byId, ...parsedVideos},
+    };
+  }
+
+  //selector for related videos section:
+  //   We create a little helper function getRelatedVideoIds which returns the related video ids for a specific video. We just a ternary expression here to be safe in case we don’t have a related object for a particular video id yet.
+  // After that, we create our selector where we iterate over the related video ids and pick the appropriate video from our state.video.byId dictionary.
+  // Theoretically there could be a case where we know the related video id but where we haven’t loaded the video yet.
+  // Therefore, we append a filter(video => video) expression which kicks out all null values in the array we return.
+
+  const getRelatedVideoIds = (state,videoId)=>{
+    console.log("from here",state.videos.related)
+    const related = state.videos.related[videoId]
+    return related ? related.items:[]
+  }
+ 
+  export const getRelatedVideos = createSelector(
+    getRelatedVideoIds,
+    state => state.videos.byId,
+    (relatedVideoIds, videos) => {
+      if (relatedVideoIds) {
+        // filter kicks out null values we might have
+        return relatedVideoIds.map(videoId => videos[videoId]).filter(video => video);
+      }
+      return [];
+    });
+  
+
+    //selectore for channel 
+    //we get the videoId from URL and search for video in our state.videosByid 
+    export const getChannelId = (state, location, name) => {
+      const videoId = getSearchParam(location, name);
+      const video = state.videos.byId[videoId];
+      if (video) {
+        return video.snippet.channelId;
+      }
+      return null;
+    };

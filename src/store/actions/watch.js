@@ -4,7 +4,7 @@ import {createAction, createRequestTypes, FAILURE, REQUEST, SUCCESS} from './ind
 export const WATCH_DETAILS = createRequestTypes('WATCH_DETAILS');
 export const details = {
   request: (videoId, channelId) => createAction(WATCH_DETAILS[REQUEST], {videoId, channelId}),
-  success: (response) => createAction(WATCH_DETAILS[SUCCESS], {response}),
+  success: (response,videoId) => createAction(WATCH_DETAILS[SUCCESS], {response,videoId}),
   failure: (response) => createAction(WATCH_DETAILS[FAILURE], {response}),
 };
 

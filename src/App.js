@@ -1,7 +1,4 @@
 import React, { Component } from 'react';
-import HeaderNav from './containers/HeaderNav/HeaderNav'
-import SideBar from './containers/SideBar/SideBar'
-
 import Home from './containers/Home/Home'
 import AppLayout from './components/AppLayout/AppLayout'
 import {Route,Switch,withRouter} from 'react-router-dom'
@@ -9,6 +6,10 @@ import Main from './Main'
 import {connect} from 'react-redux'
 import {youtubeLibraryLoaded} from './store/actions/api'
 import {bindActionCreators} from 'redux'
+import Sidhu from './containers/Watch/Sidhu'
+import  Watch  from './containers/Watch/Watch'
+import Trending from './containers/Trending/Trending';
+import Search from './containers/Search/Search'
 
 const API_KEY = 'AIzaSyBAfi5VuqfCm5oTh-Kx5axOLwx6ds3PCfw'
 
@@ -45,7 +46,13 @@ class App extends Component {
     return (
       <div className="main-container">
       <AppLayout>
-      <Main location={this.props.location.key}/>
+      <Switch>
+                <Route exact path='/' component={Home}/>
+                <Route exact path="/watch" render={()=><Watch key={this.props.location.key}/>}/>
+                <Route exact path="/sidhu" component={Sidhu}/>
+                <Route exact path="/feed/trending" component={Trending}/>
+                <Route exact path="/results" render={()=><Search key={this.props.location.key}/>}/>
+      </Switch>
       </AppLayout>
       </div>
     );

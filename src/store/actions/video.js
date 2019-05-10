@@ -1,5 +1,8 @@
 import {createAction,createRequestTypes,REQUEST,SUCCESS,FAILURE} from './index'
 
+//action creator used in trending videos page
+//we have passed nextPageToken so that it will load more videos 
+//
 export const MOST_POPULAR = createRequestTypes('MOST_POPULAR')
 export const mostPopular = {
     request:(amount,loadDescription,nextPageToken)=>createAction(MOST_POPULAR[REQUEST],{amount,loadDescription,nextPageToken}),
@@ -42,3 +45,5 @@ export const videoDetails={
   success:(response)=>createAction(VIDEO_DETAILS[SUCCESS],{response}),
   failure:(response)=>createAction(VIDEO_DETAILS[FAILURE],{response})
 }
+
+

@@ -5,7 +5,7 @@
   grid: 118px auto / 210px;
 
     &.horizontal {
-        grid: auto / 210px auto;
+        grid: auto / 246px auto;
         grid-column-gap: 4px;
         .video-info {
         grid-row: 1 / 2;
@@ -18,7 +18,16 @@
   grid-row: 2 / 3;
   grid-column: 1 / 2;
   color: $text-color-dark;
-
+   .view-and-time{
+     margin-bottom: 10px;
+   }
+   .semi-bold{
+     &.expanded{
+       font-weight:400;
+       font-size:1.3rem;
+     }
+     font-weight:600
+   }
   .video-preview-metadata-container {
     padding-top: 5px;
     font-size: 13px;

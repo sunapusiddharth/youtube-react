@@ -20,7 +20,9 @@ export class VideoPreview extends React.Component {
     const horizontal = this.props.horizontal ? 'horizontal':null
     const duration = video.contentDetails ?video.contentDetails.duration:null
     const videoDuration  =getVideoDurationString(duration)
-    
+    const expanded = this.props.expamded ?'expanded':null
+    const description = this.props.expanded ? video.snippet.description:null
+
     // Our VideoPreview component now expects two new props: pathname and search. 
     // The pathname prop is the absolute path to which the user should be redirected to.
     //  For example, if we want to get redirected to /foo/bar, then pathname must be set to ‘/foo/bar'.
@@ -29,7 +31,7 @@ export class VideoPreview extends React.Component {
     
     return (
     <Link to ={{pathname:this.props.pathname,search:this.props.search}}>
-    <div className={['video-preview',horizontal].join(' ')}>
+    <div className={['video-preview',horizontal,expanded].join(' ')}>
         <div className='image-container'>
           <Image src={video.snippet.thumbnails.medium.url}/>
           <div className='time-label'>
@@ -38,10 +40,11 @@ export class VideoPreview extends React.Component {
         </div>
 
         <div className='video-info'>
-          <div className='semi-bold show-max-two-lines'>{video.snippet.title}</div>
+          <div className={['semi-bold', 'show-max-two-lines',expanded].join(' ')}>{video.snippet.title}</div>
           <div className='video-preview-metadata-container'>
             <div className='channel-title'>{video.snippet.channelTitle}</div>
-            <div><span>{viewAndTimeString}</span></div>
+            <div className='view-and-time'>{viewAndTimeString}</div>
+            <div className='show-max-two-lines'>{description}</div>
           </div>
         </div>
       </div>

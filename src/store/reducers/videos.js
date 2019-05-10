@@ -303,3 +303,38 @@ export const videoCategoriesLoaded = createSelector(
       }
       return null;
     };
+
+
+
+    //selector for total amount of comments :
+    export const getAmountComments = createSelector(
+      getVideoById,
+      (video)=>{
+        if(video){
+          return video.statistics.commentCount
+        }
+        return 0
+      }
+    )
+
+
+    //selector for infinite scrolling of Trending videos:
+    //this selector will return the nextPageToken to the action creator 
+    const getMostPopular = (state)=>state.videos.mostPopular
+    //in the selector we depend on the getMostPopular and then we return the nextPage token from it 
+    export const getMostPopularVideosNextPageToken = createSelector(
+      getMostPopular,
+      (mostPopular)=>{
+        return mostPopular.nextPageToken
+      }
+    )
+
+    //selector to check how many available videos are present 
+    //we keep track of total no of items in global state 
+    export const allMostPopularVideosLoaded = createSelector(
+      [getMostPopular],
+      (mostPopular)=>{
+        const amountFetchedItems = mostPopular.items ? mostPopular.items.length:0
+        return amountFetchedItems === mostPopular.totalResults
+      }
+    )

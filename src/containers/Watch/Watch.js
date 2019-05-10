@@ -7,6 +7,8 @@ import {withRouter} from 'react-router-dom'
 import * as watchActions from '../../store/actions/video'
 import { getChannelId } from '../../store/reducers/videos';
 import {getSearchParam} from '../../services/url';
+import * as commentActions from '../../store/actions/comment'
+import { getCommentNextPageToken } from '../../store/reducers/comment';
  
 class Watch extends Component{
 
@@ -56,21 +58,41 @@ class Watch extends Component{
 
     render(){
         const videoId = this.getVideoId()
+        //here we are passing the fetchMoreComments fn 
+        // inside the WatchContent fn that willl load more comments 
+        //this will be called when user scrolls to the bottom 
         return(
-           <WatchContent videoId={videoId} channelId={this.props.channelId}/>
+           <WatchContent videoId={videoId} 
+           channelId={this.props.channelId}
+            bottomReachCallback={this.fetchMoreComments}
+           nextPageToken={this.props.nextPageToken}/>
         )
     }
+
+    //The fetchMoreComments function makes dispatches the COMMENT_THREAD_REQUEST action when we call it. 
+    // This is only done if we have a next page token available. 
+    // Otherwise we would just fetch the first n comments of a video again.
+
+    fetchMoreComments = ()=>{
+        if(this.props.nextPageToken){
+            this.props.fetchCommentThread(this.getVideoId,this.props.nextPageToken)
+        }
+    }
 }
+
 function mapStateToProps(state,props){
     //here we call the function getYoutubeLibraryLoaded from Redux state
     return{
         youtubeLibraryLoaded:getYoutubeLibraryLoaded(state),
-        channelId:getChannelId(state,props.location,'v')
+        channelId:getChannelId(state,props.location,'v'),
+        nextPageToken:getCommentNextPageToken(state,props.location)
     }
 }
 
+//fetchCommentThread - we use it to wire up the comment thread request action creator to our local state
 function mapDispatchToProps(dispatch){
     const fetchWatchDetails = watchActions.details.request
-    return bindActionCreators({fetchWatchDetails},dispatch)
+    const fetchCommentThread = commentActions.thread.request
+    return bindActionCreators({fetchWatchDetails,fetchCommentThread},dispatch)
 }
 export default withRouter(connect(mapStateToProps,mapDispatchToProps)(Watch))
